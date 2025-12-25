@@ -63,22 +63,62 @@ class SensorRecorder:
         print("Using XDA version %s" % xdaVersion.toXsString())
 
         print("Scanning for devices...")
+        
+        # Method 1: Try automatic scanning first
+        print("Method 1: Attempting automatic port scan...")
         portInfoArray = xda.XsScanner_scanPorts()
-
-        # Find an MTi device
         self.mtPort = xda.XsPortInfo()
+        
         for i in range(portInfoArray.size()):
             if portInfoArray[i].deviceId().isMti() or portInfoArray[i].deviceId().isMtig():
                 self.mtPort = portInfoArray[i]
+                print(f"Found MTi device on {self.mtPort.portName()}")
                 break
-
+        
+        # Method 2: If automatic scan failed, try manual scanning
         if self.mtPort.empty():
-            raise RuntimeError("No MTi device found. Aborting.")
+            print("Method 1 failed. Trying Method 2: Manual port scanning...")
+            
+            # Get all available COM ports
+            import serial.tools.list_ports
+            available_ports = [port.device for port in serial.tools.list_ports.comports()]
+            print(f"Available COM ports: {available_ports}")
+            
+            if not available_ports:
+                raise RuntimeError("No COM ports found. Aborting.")
+            
+            # Common baudrates to try
+            baudrates = [115200, 921600, 2000000, 460800, 230400]
+            
+            # Try each port with each baudrate
+            found = False
+            for port in available_ports:
+                for baudrate in baudrates:
+                    print(f"Trying {port} at {baudrate} baud...")
+                    try:
+                        test_port = xda.XsScanner_scanPort(port, baudrate)
+                        if not test_port.empty():
+                            if test_port.deviceId().isMti() or test_port.deviceId().isMtig():
+                                self.mtPort = test_port
+                                print(f"Found MTi device on {port} at {baudrate} baud!")
+                                found = True
+                                break
+                    except Exception as e:
+                        print(f"Error scanning {port} at {baudrate}: {e}")
+                        continue
+                
+                if found:
+                    break
+        
+        # Final check
+        if self.mtPort.empty():
+            raise RuntimeError("No MTi device found after trying all methods. Aborting.")
 
         did = self.mtPort.deviceId()
         print("Found a device with:")
         print(" Device ID: %s" % did.toXsString())
         print(" Port name: %s" % self.mtPort.portName())
+        print(" Baudrate: %s" % self.mtPort.baudrate())
 
         print("Opening port...")
         if not self.control.openPort(self.mtPort.portName(), self.mtPort.baudrate()):
@@ -101,7 +141,7 @@ class SensorRecorder:
         self.device_info['filter_profile'] = filter_profile.toXsString()
         
         print("Device: %s, with ID: %s opened." % 
-              (self.device_info['product_code'], self.device_info['device_id']))
+            (self.device_info['product_code'], self.device_info['device_id']))
         print("Firmware version: %s" % self.device_info['firmware_version'])
         print("Onboard Kalman Filter Profile: %s" % self.device_info['filter_profile'])
 
@@ -278,8 +318,19 @@ class SensorRecorder:
 
                 # Display progress
                 elapsed = (xda.XsTimeStamp_nowMs() - startTime) / 1000.0
-                print(f"Recording... {elapsed:.1f}s / {duration_sec}s - Packets: {packet_count}\r", 
-                      end="", flush=True)
+
+                # Get gyroscope data for display
+                if packet.containsCalibratedGyroscopeData():
+                    gyr = packet.calibratedGyroscopeData()
+                    gyr_x = gyr[0] * rad2deg
+                    gyr_y = gyr[1] * rad2deg
+                    gyr_z = gyr[2] * rad2deg
+                    print(f"Recording... {elapsed:.1f}s/{duration_sec}s - Packets: {packet_count} - "
+                        f"Gyr: X={gyr_x:7.2f}°/s Y={gyr_y:7.2f}°/s Z={gyr_z:7.2f}°/s\r", 
+                        end="", flush=True)
+                else:
+                    print(f"Recording... {elapsed:.1f}s/{duration_sec}s - Packets: {packet_count}\r", 
+                        end="", flush=True)
 
         print(f"\nRecording complete. Total packets recorded: {packet_count}")
 
