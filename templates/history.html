@@ -14,15 +14,25 @@
     .data-table-container {
         max-height: 600px;
         overflow-y: auto;
+        overflow-x: auto;
     }
     
     .stat-cell {
         font-family: 'Courier New', monospace;
-        font-size: 0.9rem;
+        font-size: 0.85rem;
+        white-space: nowrap;
     }
     
     .detail-row {
         background-color: #f8f9fa;
+    }
+    
+    #data-table {
+        min-width: 1200px;
+    }
+    
+    #data-table th {
+        white-space: nowrap;
     }
 </style>
 {% endblock %}
@@ -149,12 +159,15 @@
                                 <th>Timestamp</th>
                                 <th>Product Code</th>
                                 <th>Device ID</th>
+                                <th>Gyro X (deg/s)</th>
+                                <th>Gyro Y (deg/s)</th>
+                                <th>Gyro Z (deg/s)</th>
                                 <th>Actions</th>
                             </tr>
                         </thead>
                         <tbody id="table-body">
                             <tr>
-                                <td colspan="4" class="text-center text-muted">
+                                <td colspan="7" class="text-center text-muted">
                                     <i class="bi bi-inbox"></i> No data available. Apply filters to load data.
                                 </td>
                             </tr>
@@ -270,7 +283,7 @@
         if (data.length === 0) {
             tbody.append(`
                 <tr>
-                    <td colspan="4" class="text-center text-muted">
+                    <td colspan="7" class="text-center text-muted">
                         <i class="bi bi-inbox"></i> No records found matching the criteria.
                     </td>
                 </tr>
@@ -280,11 +293,18 @@
         
         data.forEach(function(record) {
             const timestamp = formatTimestamp(record.time);
+            const gyroX = formatMeanStd(record.gyro_x_mean, record.gyro_x_stddev);
+            const gyroY = formatMeanStd(record.gyro_y_mean, record.gyro_y_stddev);
+            const gyroZ = formatMeanStd(record.gyro_z_mean, record.gyro_z_stddev);
+            
             const row = $(`
                 <tr>
                     <td>${timestamp}</td>
                     <td>${record.product_code}</td>
                     <td><code>${record.device_id}</code></td>
+                    <td class="stat-cell">${gyroX}</td>
+                    <td class="stat-cell">${gyroY}</td>
+                    <td class="stat-cell">${gyroZ}</td>
                     <td>
                         <button class="btn btn-sm btn-primary" onclick="showDetails(${record.id})">
                             <i class="bi bi-eye"></i> View Details
@@ -450,6 +470,15 @@
             return 'N/A';
         }
         return parseFloat(value).toFixed(6);
+    }
+
+    function formatMeanStd(mean, stddev) {
+        if (mean === null || mean === undefined || stddev === null || stddev === undefined) {
+            return 'N/A';
+        }
+        const meanVal = parseFloat(mean).toFixed(4);
+        const stdVal = parseFloat(stddev).toFixed(4);
+        return `${meanVal} ± ${stdVal}`;
     }
 </script>
 {% endblock %}
