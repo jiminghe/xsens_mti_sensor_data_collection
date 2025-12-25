@@ -3,8 +3,9 @@ Flask Web Application for Xsens Sensor Data Collection
 Main application file with routes and server configuration
 """
 
-from flask import Flask, render_template, jsonify, request, send_file
+from flask import Flask, render_template, jsonify, request, send_file, session
 from flask_socketio import SocketIO, emit
+from flask_babel import Babel, gettext
 import threading
 import sys
 import io
@@ -17,7 +18,26 @@ import sqlite3
 
 app = Flask(__name__)
 app.config['SECRET_KEY'] = 'xsens-sensor-data-collection-2024'
+app.config['BABEL_DEFAULT_LOCALE'] = 'zh'  # Default to Chinese
+app.config['BABEL_TRANSLATION_DIRECTORIES'] = 'translations'
 socketio = SocketIO(app, cors_allowed_origins="*")
+
+# Initialize Babel
+def get_locale():
+    # Check if user has set a language preference in session
+    if 'language' in session:
+        return session['language']
+    # Otherwise use default (Chinese)
+    return 'zh'
+
+babel = Babel(app, locale_selector=get_locale)
+
+# Make current language available in all templates
+@app.context_processor
+def inject_conf_var():
+    return dict(
+        current_language=get_locale()
+    )
 
 # Global variables for measurement process
 measurement_thread = None
@@ -354,6 +374,19 @@ def get_filter_options():
         
     except sqlite3.Error as e:
         return jsonify({'success': False, 'error': str(e)}), 500
+
+
+@app.route('/api/set_language', methods=['POST'])
+def set_language():
+    """API endpoint to change language"""
+    data = request.get_json()
+    language = data.get('language', 'zh')
+    
+    if language in ['zh', 'en']:
+        session['language'] = language
+        return jsonify({'success': True, 'language': language})
+    
+    return jsonify({'success': False, 'error': 'Invalid language'}), 400
 
 
 @socketio.on('connect', namespace='/measurement')

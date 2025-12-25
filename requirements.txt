@@ -1,5 +1,6 @@
 Flask==3.0.0
 flask-socketio==5.3.5
+flask-babel==4.0.0
 numpy==1.24.3
 xsensdeviceapi
 python-engineio==4.8.0

@@ -1,6 +1,6 @@
 {% extends "base.html" %}
 
-{% block title %}Historical Data - Xsens Sensor Data Collection{% endblock %}
+{% block title %}{{ _('Historical Data') }} - {{ _('Xsens Sensor Data Collection') }}{% endblock %}
 
 {% block extra_css %}
 <style>
@@ -42,48 +42,48 @@
     <div class="col-md-12">
         <div class="d-flex justify-content-between align-items-center mb-4">
             <h2>
-                <i class="bi bi-clock-history"></i> Historical Sensor Data
+                <i class="bi bi-clock-history"></i> {{ _('Historical Sensor Data') }}
             </h2>
             <a href="/" class="btn btn-outline-secondary">
-                <i class="bi bi-arrow-left"></i> Back to Home
+                <i class="bi bi-arrow-left"></i> {{ _('Back to Home') }}
             </a>
         </div>
 
         <!-- Filters -->
         <div class="card mb-4 shadow-sm">
             <div class="card-header bg-primary text-white">
-                <h5 class="mb-0"><i class="bi bi-funnel"></i> Filter Data</h5>
+                <h5 class="mb-0"><i class="bi bi-funnel"></i> {{ _('Filter Data') }}</h5>
             </div>
             <div class="card-body filter-section">
                 <div class="row g-3">
                     <div class="col-md-3">
-                        <label for="filter-year" class="form-label">Year</label>
+                        <label for="filter-year" class="form-label">{{ _('Year') }}</label>
                         <select id="filter-year" class="form-select">
-                            <option value="">All Years</option>
+                            <option value="">{{ _('All Years') }}</option>
                         </select>
                     </div>
                     <div class="col-md-3">
-                        <label for="filter-month" class="form-label">Month</label>
+                        <label for="filter-month" class="form-label">{{ _('Month') }}</label>
                         <select id="filter-month" class="form-select">
-                            <option value="">All Months</option>
-                            <option value="01">January</option>
-                            <option value="02">February</option>
-                            <option value="03">March</option>
-                            <option value="04">April</option>
-                            <option value="05">May</option>
-                            <option value="06">June</option>
-                            <option value="07">July</option>
-                            <option value="08">August</option>
-                            <option value="09">September</option>
-                            <option value="10">October</option>
-                            <option value="11">November</option>
-                            <option value="12">December</option>
+                            <option value="">{{ _('All Months') }}</option>
+                            <option value="01">{{ _('January') }}</option>
+                            <option value="02">{{ _('February') }}</option>
+                            <option value="03">{{ _('March') }}</option>
+                            <option value="04">{{ _('April') }}</option>
+                            <option value="05">{{ _('May') }}</option>
+                            <option value="06">{{ _('June') }}</option>
+                            <option value="07">{{ _('July') }}</option>
+                            <option value="08">{{ _('August') }}</option>
+                            <option value="09">{{ _('September') }}</option>
+                            <option value="10">{{ _('October') }}</option>
+                            <option value="11">{{ _('November') }}</option>
+                            <option value="12">{{ _('December') }}</option>
                         </select>
                     </div>
                     <div class="col-md-3">
-                        <label for="filter-date" class="form-label">Date</label>
+                        <label for="filter-date" class="form-label">{{ _('Date') }}</label>
                         <select id="filter-date" class="form-select">
-                            <option value="">All Dates</option>
+                            <option value="">{{ _('All Dates') }}</option>
                             <option value="01">01</option>
                             <option value="02">02</option>
                             <option value="03">03</option>
@@ -118,23 +118,23 @@
                         </select>
                     </div>
                     <div class="col-md-3">
-                        <label for="filter-device" class="form-label">Device ID</label>
+                        <label for="filter-device" class="form-label">{{ _('Device ID') }}</label>
                         <select id="filter-device" class="form-select">
-                            <option value="">All Devices</option>
+                            <option value="">{{ _('All Devices') }}</option>
                         </select>
                     </div>
                 </div>
                 <div class="row mt-3">
                     <div class="col-md-12">
                         <button class="btn btn-primary" onclick="applyFilters()">
-                            <i class="bi bi-search"></i> Apply Filters
+                            <i class="bi bi-search"></i> {{ _('Apply Filters') }}
                         </button>
                         <button class="btn btn-secondary" onclick="clearFilters()">
-                            <i class="bi bi-x-circle"></i> Clear Filters
+                            <i class="bi bi-x-circle"></i> {{ _('Clear Filters') }}
                         </button>
                         <span id="loading-spinner" class="ms-3" style="display: none;">
                             <span class="spinner-border spinner-border-sm" role="status"></span>
-                            Loading...
+                            {{ _('Loading') }}...
                         </span>
                     </div>
                 </div>
@@ -149,26 +149,26 @@
         <!-- Data Table -->
         <div class="card shadow-sm">
             <div class="card-header bg-dark text-white">
-                <h5 class="mb-0"><i class="bi bi-table"></i> Sensor Records</h5>
+                <h5 class="mb-0"><i class="bi bi-table"></i> {{ _('Sensor Records') }}</h5>
             </div>
             <div class="card-body p-0">
                 <div class="data-table-container">
                     <table class="table table-striped table-hover mb-0" id="data-table">
                         <thead class="table-dark sticky-top">
                             <tr>
-                                <th>Timestamp</th>
-                                <th>Product Code</th>
-                                <th>Device ID</th>
+                                <th>{{ _('Timestamp') }}</th>
+                                <th>{{ _('Product Code') }}</th>
+                                <th>{{ _('Device ID') }}</th>
                                 <th>Gyro X (deg/s)</th>
                                 <th>Gyro Y (deg/s)</th>
                                 <th>Gyro Z (deg/s)</th>
-                                <th>Actions</th>
+                                <th>{{ _('Actions') }}</th>
                             </tr>
                         </thead>
                         <tbody id="table-body">
                             <tr>
                                 <td colspan="7" class="text-center text-muted">
-                                    <i class="bi bi-inbox"></i> No data available. Apply filters to load data.
+                                    <i class="bi bi-inbox"></i> {{ _('No data available. Apply filters to load data.') }}
                                 </td>
                             </tr>
                         </tbody>
@@ -185,7 +185,7 @@
         <div class="modal-content">
             <div class="modal-header bg-primary text-white">
                 <h5 class="modal-title">
-                    <i class="bi bi-graph-up"></i> Detailed Statistics
+                    <i class="bi bi-graph-up"></i> {{ _('Detailed Statistics') }}
                 </h5>
                 <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
             </div>
@@ -193,7 +193,7 @@
                 <!-- Content loaded dynamically -->
             </div>
             <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">{{ _('Close') }}</button>
             </div>
         </div>
     </div>

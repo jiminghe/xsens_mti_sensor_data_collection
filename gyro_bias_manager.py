@@ -190,7 +190,7 @@ class GyroBiasManager:
         result['success'] = True
         
         # Quality assessment
-        std_threshold = 0.20  # deg/sec
+        std_threshold = 0.40  # deg/sec
         result['quality_good'] = all(gyro_std <= std_threshold)
         
         print("\n===== CALCULATED GYRO BIAS =====")

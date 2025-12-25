@@ -1,6 +1,6 @@
 {% extends "base.html" %}
 
-{% block title %}Measure Data - Xsens Sensor Data Collection{% endblock %}
+{% block title %}{{ _('Measure Data') }} - {{ _('Xsens Sensor Data Collection') }}{% endblock %}
 
 {% block extra_css %}
 <style>
@@ -33,30 +33,30 @@
     <div class="col-md-12">
         <div class="d-flex justify-content-between align-items-center mb-4">
             <h2>
-                <i class="bi bi-play-circle"></i> Sensor Data Measurement
+                <i class="bi bi-play-circle"></i> {{ _('Sensor Data Measurement') }}
             </h2>
             <a href="/" class="btn btn-outline-secondary">
-                <i class="bi bi-arrow-left"></i> Back to Home
+                <i class="bi bi-arrow-left"></i> {{ _('Back to Home') }}
             </a>
         </div>
 
         <!-- Control Panel -->
         <div class="card mb-4 shadow-sm">
             <div class="card-header bg-primary text-white">
-                <h5 class="mb-0"><i class="bi bi-gear"></i> Measurement Control</h5>
+                <h5 class="mb-0"><i class="bi bi-gear"></i> {{ _('Measurement Control') }}</h5>
             </div>
             <div class="card-body">
                 <div class="row align-items-center">
                     <div class="col-md-6">
                         <button id="start-btn" class="btn btn-success btn-lg w-100" onclick="startMeasurement()">
-                            <i class="bi bi-play-fill"></i> Start Measurement
+                            <i class="bi bi-play-fill"></i> {{ _('Start Measurement') }}
                         </button>
                     </div>
                     <div class="col-md-6">
                         <div class="text-center">
-                            <h6 class="mb-2">Current Status:</h6>
+                            <h6 class="mb-2">{{ _('Current Status') }}:</h6>
                             <span id="status-badge" class="badge bg-secondary status-badge">
-                                <i class="bi bi-circle"></i> Ready
+                                <i class="bi bi-circle"></i> {{ _('Ready') }}
                             </span>
                         </div>
                     </div>
@@ -67,21 +67,21 @@
         <!-- Device Information -->
         <div id="device-info-card" class="card mb-4 shadow-sm" style="display: none;">
             <div class="card-header bg-info text-white">
-                <h5 class="mb-0"><i class="bi bi-cpu"></i> Device Information</h5>
+                <h5 class="mb-0"><i class="bi bi-cpu"></i> {{ _('Device Information') }}</h5>
             </div>
             <div class="card-body">
                 <div class="row">
                     <div class="col-md-3">
-                        <p class="mb-1"><strong>Product Code:</strong> <span id="product-code">-</span></p>
+                        <p class="mb-1"><strong>{{ _('Product Code') }}:</strong> <span id="product-code">-</span></p>
                     </div>
                     <div class="col-md-3">
-                        <p class="mb-1"><strong>Device ID:</strong> <span id="device-id">-</span></p>
+                        <p class="mb-1"><strong>{{ _('Device ID') }}:</strong> <span id="device-id">-</span></p>
                     </div>
                     <div class="col-md-3">
-                        <p class="mb-1"><strong>Firmware Version:</strong> <span id="firmware-version">-</span></p>
+                        <p class="mb-1"><strong>{{ _('Firmware Version') }}:</strong> <span id="firmware-version">-</span></p>
                     </div>
                     <div class="col-md-3">
-                        <p class="mb-1"><strong>Filter Profile:</strong> <span id="filter-profile">-</span></p>
+                        <p class="mb-1"><strong>{{ _('Filter Profile') }}:</strong> <span id="filter-profile">-</span></p>
                     </div>
                 </div>
             </div>
@@ -91,9 +91,9 @@
         <div class="card shadow-sm">
             <div class="card-header bg-dark text-white">
                 <h5 class="mb-0">
-                    <i class="bi bi-terminal"></i> Console Output
+                    <i class="bi bi-terminal"></i> {{ _('Console Output') }}
                     <button class="btn btn-sm btn-outline-light float-end" onclick="clearConsole()">
-                        <i class="bi bi-trash"></i> Clear
+                        <i class="bi bi-trash"></i> {{ _('Clear') }}
                     </button>
                 </h5>
             </div>
@@ -108,17 +108,17 @@
                 <div class="modal-content">
                     <div class="modal-header bg-success text-white">
                         <h5 class="modal-title">
-                            <i class="bi bi-check-circle"></i> Measurement Complete
+                            <i class="bi bi-check-circle"></i> {{ _('Measurement Complete') }}
                         </h5>
                         <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
                     </div>
                     <div class="modal-body">
-                        <p class="mb-3">Measurement completed successfully!</p>
+                        <p class="mb-3">{{ _('Measurement completed successfully!') }}</p>
                         <div id="complete-info"></div>
                     </div>
                     <div class="modal-footer">
-                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                        <a href="/history" class="btn btn-primary">View Historical Data</a>
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">{{ _('Close') }}</button>
+                        <a href="/history" class="btn btn-primary">{{ _('View Historical Data') }}</a>
                     </div>
                 </div>
             </div>
@@ -130,38 +130,37 @@
                 <div class="modal-content">
                     <div class="modal-header bg-warning text-dark">
                         <h5 class="modal-title">
-                            <i class="bi bi-gear-fill"></i> Gyroscope Bias Calibration
+                            <i class="bi bi-gear-fill"></i> {{ _('Gyroscope Bias Calibration') }}
                         </h5>
                         <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
                     </div>
                     <div class="modal-body">
                         <div class="alert alert-info">
                             <i class="bi bi-info-circle"></i> 
-                            The sensor was measured with zero bias offset. Choose which bias values to apply.
+                            {{ _('The sensor was measured with zero bias offset. Choose which bias values to apply.') }}
                         </div>
                         
-                        <h6>Bias Comparison:</h6>
+                        <h6>{{ _('Bias Comparison') }}:</h6>
                         <div id="bias-comparison"></div>
                         
                         <div id="bias-quality-warning" class="alert alert-warning mt-3" style="display: none;">
                             <i class="bi bi-exclamation-triangle"></i> 
-                            <strong>Quality Warning:</strong> High variability detected in the new measurements. 
-                            Standard deviations exceed 0.20 deg/s threshold. Consider keeping the original bias or re-measuring with better stability.
+                            <strong>{{ _('Quality Warning') }}:</strong> {{ _('High variability detected in the new measurements. Standard deviations exceed 0.40 deg/s threshold. Consider keeping the original bias or re-measuring with better stability.') }}
                         </div>
                         
                         <div id="bias-quality-good" class="alert alert-success mt-3" style="display: none;">
                             <i class="bi bi-check-circle"></i> 
-                            <strong>Good Quality:</strong> New measurements show low variability (std dev < 0.20 deg/s). Safe to apply new bias values.
+                            <strong>{{ _('Good Quality') }}:</strong> {{ _('New measurements show low variability (std dev < 0.40 deg/s). Safe to apply new bias values.') }}
                         </div>
                         
-                        <p class="mt-3"><strong>Which bias values do you want to apply?</strong></p>
+                        <p class="mt-3"><strong>{{ _('Which bias values do you want to apply?') }}</strong></p>
                     </div>
                     <div class="modal-footer">
                         <button type="button" class="btn btn-secondary" id="keep-original-btn" onclick="keepOriginalBias()">
-                            <i class="bi bi-arrow-counterclockwise"></i> Keep Original
+                            <i class="bi bi-arrow-counterclockwise"></i> {{ _('Keep Original') }}
                         </button>
                         <button type="button" class="btn btn-primary" id="apply-new-btn" onclick="applyNewBias()">
-                            <i class="bi bi-gear-fill"></i> Apply New Bias
+                            <i class="bi bi-gear-fill"></i> {{ _('Apply New Bias') }}
                         </button>
                     </div>
                 </div>

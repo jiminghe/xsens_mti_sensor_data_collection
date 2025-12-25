@@ -1,0 +1,390 @@
+# Translations template for PROJECT.
+# Copyright (C) 2025 ORGANIZATION
+# This file is distributed under the same license as the PROJECT project.
+# FIRST AUTHOR <EMAIL@ADDRESS>, 2025.
+#
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: PROJECT VERSION\n"
+"Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
+"POT-Creation-Date: 2025-12-25 20:59+0800\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=utf-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Generated-By: Babel 2.17.0\n"
+
+#: templates/base.html:6 templates/base.html:24 templates/history.html:3
+#: templates/index.html:3 templates/index.html:11 templates/measure.html:3
+msgid "Xsens Sensor Data Collection"
+msgstr "Xsens传感器数据采集系统"
+
+#: templates/base.html:33 templates/index.html:3
+msgid "Home"
+msgstr "主页"
+
+#: templates/base.html:38 templates/index.html:24 templates/measure.html:3
+msgid "Measure Data"
+msgstr "测量数据"
+
+#: templates/base.html:43 templates/history.html:3
+msgid "Historical Data"
+msgstr "历史数据"
+
+#: templates/base.html:68
+msgid "Xsens Sensor Data Collection System"
+msgstr "Xsens传感器数据采集系统"
+
+#: templates/history.html:45
+msgid "Historical Sensor Data"
+msgstr "专业的IMU传感器数据采集和分析系统"
+
+#: templates/history.html:48 templates/measure.html:39
+msgid "Back to Home"
+msgstr "返回主页"
+
+#: templates/history.html:55
+msgid "Filter Data"
+msgstr "筛选数据"
+
+#: templates/history.html:60
+msgid "Year"
+msgstr "年"
+
+#: templates/history.html:62
+msgid "All Years"
+msgstr "所有年"
+
+#: templates/history.html:66
+msgid "Month"
+msgstr "月"
+
+#: templates/history.html:68
+msgid "All Months"
+msgstr "所有月"
+
+#: templates/history.html:69
+msgid "January"
+msgstr "一月"
+
+#: templates/history.html:70
+msgid "February"
+msgstr "二月"
+
+#: templates/history.html:71
+msgid "March"
+msgstr "三月"
+
+#: templates/history.html:72
+msgid "April"
+msgstr "四月"
+
+#: templates/history.html:73
+msgid "May"
+msgstr "五月"
+
+#: templates/history.html:74
+msgid "June"
+msgstr "六月"
+
+#: templates/history.html:75
+msgid "July"
+msgstr "七月"
+
+#: templates/history.html:76
+msgid "August"
+msgstr "八月"
+
+#: templates/history.html:77
+msgid "September"
+msgstr "九月"
+
+#: templates/history.html:78
+msgid "October"
+msgstr "十月"
+
+#: templates/history.html:79
+msgid "November"
+msgstr "十一月"
+
+#: templates/history.html:80
+msgid "December"
+msgstr "十二月"
+
+#: templates/history.html:84
+msgid "Date"
+msgstr "日期"
+
+#: templates/history.html:86
+msgid "All Dates"
+msgstr "所有日期"
+
+#: templates/history.html:121 templates/history.html:161
+#: templates/measure.html:78
+msgid "Device ID"
+msgstr "序列号"
+
+#: templates/history.html:123
+msgid "All Devices"
+msgstr "所有设备"
+
+#: templates/history.html:130
+msgid "Apply Filters"
+msgstr "应用筛选"
+
+#: templates/history.html:133
+msgid "Clear Filters"
+msgstr "清楚筛选"
+
+#: templates/history.html:137
+msgid "Loading"
+msgstr "加载"
+
+#: templates/history.html:152
+msgid "Sensor Records"
+msgstr "传感器记录"
+
+#: templates/history.html:159
+msgid "Timestamp"
+msgstr "时间"
+
+#: templates/history.html:160 templates/measure.html:75
+msgid "Product Code"
+msgstr "产品型号"
+
+#: templates/history.html:165
+msgid "Actions"
+msgstr "操作"
+
+#: templates/history.html:171
+msgid "No data available. Apply filters to load data."
+msgstr "无可用数据，应用筛选以加载数据"
+
+#: templates/history.html:188
+msgid "Detailed Statistics"
+msgstr "详细统计"
+
+#: templates/history.html:196 templates/measure.html:120
+msgid "Close"
+msgstr "关闭"
+
+#: templates/index.html:13
+msgid "Professional sensor data acquisition and analysis system"
+msgstr "专业的IMU传感器数据采集和分析系统"
+
+#: templates/index.html:26
+msgid "Start a new measurement session. The system will automatically configure the sensor, record data for 30 seconds, and analyze the results."
+msgstr "开始新的测量会话，系统会自动配置传感器，记录数据30秒，并且分析结果。"
+
+
+#: templates/index.html:29 templates/measure.html:52
+msgid "Start Measurement"
+msgstr "开始测量"
+
+#: templates/index.html:34
+msgid "Automatic device detection"
+msgstr "自动检测"
+
+#: templates/index.html:35
+msgid "100Hz sensor configuration"
+msgstr "100Hz 传感器配置"
+
+#: templates/index.html:36
+msgid "30-second data recording"
+msgstr "30秒数据记录"
+
+#: templates/index.html:37
+msgid "Automatic analysis & storage"
+msgstr "自动分析和记录"
+
+#: templates/index.html:50 templates/measure.html:121
+msgid "View Historical Data"
+msgstr "查看历史数据"
+
+#: templates/index.html:52
+msgid "Browse and analyze previously recorded sensor data. Filter by date, device ID, and view detailed statistics."
+msgstr "查看和分析历史传感器数据。通过日期，序列号筛选结果，查看详细统计数据。"
+
+#: templates/index.html:55
+msgid "View History"
+msgstr "查看历史数据"
+
+#: templates/index.html:60
+msgid "Search by date & device"
+msgstr "通过日期和序列号搜索"
+
+#: templates/index.html:61
+msgid "View mean & std deviation"
+msgstr "查看均值和标准差值"
+
+#: templates/index.html:62
+msgid "Export capabilities"
+msgstr "导出能力"
+
+#: templates/index.html:63
+msgid "Detailed sensor statistics"
+msgstr "详细的传感器统计"
+
+#: templates/index.html:76
+msgid "System Information"
+msgstr "系统信息"
+
+#: templates/index.html:80
+msgid "Sampling Rate"
+msgstr "采样率"
+
+#: templates/index.html:81
+msgid "Recording Duration"
+msgstr "记录时间"
+
+#: templates/index.html:81
+msgid "seconds"
+msgstr "秒"
+
+#: templates/index.html:84
+msgid "Sensors Monitored"
+msgstr "测量的传感器"
+
+#: templates/index.html:86
+msgid "Gyroscope (Rate of Turn)"
+msgstr "陀螺仪(Rate of Turn)"
+
+#: templates/index.html:87
+msgid "Accelerometer"
+msgstr "加速度计"
+
+#: templates/index.html:88
+msgid "Magnetometer"
+msgstr "磁力计"
+
+#: templates/index.html:89
+msgid "Temperature"
+msgstr "温度"
+
+#: templates/index.html:93
+msgid "Output Data"
+msgstr "输出数据"
+
+#: templates/index.html:95
+msgid "Quaternion Orientation"
+msgstr "姿态四元数"
+
+#: templates/index.html:96
+msgid "Euler Angles (Roll, Pitch, Yaw)"
+msgstr "欧拉角(Roll, Pitch, Yaw)"
+
+#: templates/index.html:97
+msgid "Statistical Analysis"
+msgstr "统计分析"
+
+#: templates/index.html:98
+msgid "Database Storage"
+msgstr "数据库保存"
+
+#: templates/measure.html:36
+msgid "Sensor Data Measurement"
+msgstr "传感器数据测量"
+
+#: templates/measure.html:46
+msgid "Measurement Control"
+msgstr "测量控制"
+
+#: templates/measure.html:57
+msgid "Current Status"
+msgstr "目前状态"
+
+#: templates/measure.html:59
+msgid "Ready"
+msgstr "准备"
+
+#: templates/measure.html:70
+msgid "Device Information"
+msgstr "设备信息"
+
+#: templates/measure.html:81
+msgid "Firmware Version"
+msgstr "固件版本"
+
+#: templates/measure.html:84
+msgid "Filter Profile"
+msgstr "滤波器"
+
+#: templates/measure.html:94
+msgid "Console Output"
+msgstr "实时输出"
+
+#: templates/measure.html:96
+msgid "Clear"
+msgstr "清除"
+
+#: templates/measure.html:111
+msgid "Measurement Complete"
+msgstr "测量完毕"
+
+#: templates/measure.html:116
+msgid "Measurement completed successfully!"
+msgstr "测量完毕成功"
+
+#: templates/measure.html:133
+msgid "Gyroscope Bias Calibration"
+msgstr "陀螺仪零偏标定"
+
+#: templates/measure.html:140
+msgid "The sensor was measured with zero bias offset. Choose which bias values to apply."
+msgstr "传感器进行了零偏增量值测量。选择哪个零偏增量值保存到传感器"
+
+#: templates/measure.html:143
+msgid "Bias Comparison"
+msgstr "零偏对比"
+
+#: templates/measure.html:148
+msgid "Quality Warning"
+msgstr "质量分析"
+
+#: templates/measure.html:148
+msgid "High variability detected in the new measurements. Standard deviations exceed 0.40 deg/s threshold. Consider keeping the original bias or remeasuring with better stability."
+msgstr "在新的测量中检测到较高的标准差. 标准差超过了0.40 deg/s阈值。考虑保持原来的值或者重新在稳定安静的环境中测试。"
+
+#: templates/measure.html:153
+msgid "Good Quality"
+msgstr "较好质量"
+
+#: templates/measure.html:153
+msgid "New measurements show low variability (std dev < 0.40 deg/s). Safe to apply new bias values."
+msgstr "新的测量显示出较低的标准差 (std dev < 0.40 deg/s). 建议应用新测量到的陀螺仪零偏增量值。"
+
+#: templates/measure.html:156
+msgid "Which bias values do you want to apply?"
+msgstr "你希望保存哪个零偏值？"
+
+#: templates/measure.html:160
+msgid "Keep Original"
+msgstr "保存原来的零偏"
+
+#: templates/measure.html:163
+msgid "Apply New Bias"
+msgstr "保存新的零偏"
+
+msgid "Axis"
+msgstr "轴"
+
+msgid "Original Bias (deg/s)"
+msgstr "原来的零偏(deg/s)"
+
+msgid "New Bias (deg/s)"
+msgstr "新的零偏(deg/s)"
+
+msgid "Std Dev (deg/s)"
+msgstr "标准差(deg/s)"
+
+msgid "Original bias restored "
+msgstr "原来的零偏值已保存 "
+
+msgid "New Bias Successfully Applied!"
+msgstr "新的零偏值成功保存！"
+
+msgid "The sensor's gyroscope bias has been updated with the newly calculated values."
+msgstr "传感器的陀螺仪零偏值已经更新为新计算的值。"
