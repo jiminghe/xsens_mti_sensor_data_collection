@@ -1,0 +1,110 @@
+{% extends "base.html" %}
+
+{% block title %}Home - Xsens Sensor Data Collection{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center mt-5">
+    <div class="col-md-10">
+        <div class="text-center mb-5">
+            <h1 class="display-4">
+                <i class="bi bi-cpu-fill text-primary"></i>
+                Xsens Sensor Data Collection
+            </h1>
+            <p class="lead text-muted">Professional sensor data acquisition and analysis system</p>
+        </div>
+
+        <div class="row g-4">
+            <!-- Measure Data Card -->
+            <div class="col-md-6">
+                <div class="card h-100 shadow-sm hover-card">
+                    <div class="card-body text-center p-5">
+                        <div class="mb-4">
+                            <i class="bi bi-play-circle-fill display-1 text-success"></i>
+                        </div>
+                        <h3 class="card-title mb-3">Measure Data</h3>
+                        <p class="card-text text-muted mb-4">
+                            Start a new measurement session. The system will automatically configure 
+                            the sensor, record data for 30 seconds, and analyze the results.
+                        </p>
+                        <a href="/measure" class="btn btn-success btn-lg px-5">
+                            <i class="bi bi-play-circle"></i> Start Measurement
+                        </a>
+                    </div>
+                    <div class="card-footer bg-transparent border-0 pb-4">
+                        <ul class="list-unstyled text-start small text-muted mb-0">
+                            <li><i class="bi bi-check-circle-fill text-success"></i> Automatic device detection</li>
+                            <li><i class="bi bi-check-circle-fill text-success"></i> 100Hz sensor configuration</li>
+                            <li><i class="bi bi-check-circle-fill text-success"></i> 30-second data recording</li>
+                            <li><i class="bi bi-check-circle-fill text-success"></i> Automatic analysis & storage</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+
+            <!-- View Historical Data Card -->
+            <div class="col-md-6">
+                <div class="card h-100 shadow-sm hover-card">
+                    <div class="card-body text-center p-5">
+                        <div class="mb-4">
+                            <i class="bi bi-clock-history display-1 text-info"></i>
+                        </div>
+                        <h3 class="card-title mb-3">View Historical Data</h3>
+                        <p class="card-text text-muted mb-4">
+                            Browse and analyze previously recorded sensor data. Filter by date, 
+                            device ID, and view detailed statistics.
+                        </p>
+                        <a href="/history" class="btn btn-info btn-lg px-5">
+                            <i class="bi bi-clock-history"></i> View History
+                        </a>
+                    </div>
+                    <div class="card-footer bg-transparent border-0 pb-4">
+                        <ul class="list-unstyled text-start small text-muted mb-0">
+                            <li><i class="bi bi-check-circle-fill text-info"></i> Search by date & device</li>
+                            <li><i class="bi bi-check-circle-fill text-info"></i> View mean & std deviation</li>
+                            <li><i class="bi bi-check-circle-fill text-info"></i> Export capabilities</li>
+                            <li><i class="bi bi-check-circle-fill text-info"></i> Detailed sensor statistics</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- System Info -->
+        <div class="row mt-5">
+            <div class="col-md-12">
+                <div class="card bg-light">
+                    <div class="card-body">
+                        <h5 class="card-title">
+                            <i class="bi bi-info-circle"></i> System Information
+                        </h5>
+                        <div class="row">
+                            <div class="col-md-4">
+                                <p class="mb-1"><strong>Sampling Rate:</strong> 100 Hz</p>
+                                <p class="mb-1"><strong>Recording Duration:</strong> 30 seconds</p>
+                            </div>
+                            <div class="col-md-4">
+                                <p class="mb-1"><strong>Sensors Monitored:</strong></p>
+                                <ul class="small mb-0">
+                                    <li>Gyroscope (Rate of Turn)</li>
+                                    <li>Accelerometer</li>
+                                    <li>Magnetometer</li>
+                                    <li>Temperature</li>
+                                </ul>
+                            </div>
+                            <div class="col-md-4">
+                                <p class="mb-1"><strong>Output Data:</strong></p>
+                                <ul class="small mb-0">
+                                    <li>Quaternion Orientation</li>
+                                    <li>Euler Angles (Roll, Pitch, Yaw)</li>
+                                    <li>Statistical Analysis</li>
+                                    <li>Database Storage</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

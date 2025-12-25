@@ -1,0 +1,455 @@
+{% extends "base.html" %}
+
+{% block title %}Historical Data - Xsens Sensor Data Collection{% endblock %}
+
+{% block extra_css %}
+<style>
+    .filter-section {
+        background-color: #f8f9fa;
+        padding: 20px;
+        border-radius: 5px;
+        margin-bottom: 20px;
+    }
+    
+    .data-table-container {
+        max-height: 600px;
+        overflow-y: auto;
+    }
+    
+    .stat-cell {
+        font-family: 'Courier New', monospace;
+        font-size: 0.9rem;
+    }
+    
+    .detail-row {
+        background-color: #f8f9fa;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-md-12">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <h2>
+                <i class="bi bi-clock-history"></i> Historical Sensor Data
+            </h2>
+            <a href="/" class="btn btn-outline-secondary">
+                <i class="bi bi-arrow-left"></i> Back to Home
+            </a>
+        </div>
+
+        <!-- Filters -->
+        <div class="card mb-4 shadow-sm">
+            <div class="card-header bg-primary text-white">
+                <h5 class="mb-0"><i class="bi bi-funnel"></i> Filter Data</h5>
+            </div>
+            <div class="card-body filter-section">
+                <div class="row g-3">
+                    <div class="col-md-3">
+                        <label for="filter-year" class="form-label">Year</label>
+                        <select id="filter-year" class="form-select">
+                            <option value="">All Years</option>
+                        </select>
+                    </div>
+                    <div class="col-md-3">
+                        <label for="filter-month" class="form-label">Month</label>
+                        <select id="filter-month" class="form-select">
+                            <option value="">All Months</option>
+                            <option value="01">January</option>
+                            <option value="02">February</option>
+                            <option value="03">March</option>
+                            <option value="04">April</option>
+                            <option value="05">May</option>
+                            <option value="06">June</option>
+                            <option value="07">July</option>
+                            <option value="08">August</option>
+                            <option value="09">September</option>
+                            <option value="10">October</option>
+                            <option value="11">November</option>
+                            <option value="12">December</option>
+                        </select>
+                    </div>
+                    <div class="col-md-3">
+                        <label for="filter-date" class="form-label">Date</label>
+                        <select id="filter-date" class="form-select">
+                            <option value="">All Dates</option>
+                            <option value="01">01</option>
+                            <option value="02">02</option>
+                            <option value="03">03</option>
+                            <option value="04">04</option>
+                            <option value="05">05</option>
+                            <option value="06">06</option>
+                            <option value="07">07</option>
+                            <option value="08">08</option>
+                            <option value="09">09</option>
+                            <option value="10">10</option>
+                            <option value="11">11</option>
+                            <option value="12">12</option>
+                            <option value="13">13</option>
+                            <option value="14">14</option>
+                            <option value="15">15</option>
+                            <option value="16">16</option>
+                            <option value="17">17</option>
+                            <option value="18">18</option>
+                            <option value="19">19</option>
+                            <option value="20">20</option>
+                            <option value="21">21</option>
+                            <option value="22">22</option>
+                            <option value="23">23</option>
+                            <option value="24">24</option>
+                            <option value="25">25</option>
+                            <option value="26">26</option>
+                            <option value="27">27</option>
+                            <option value="28">28</option>
+                            <option value="29">29</option>
+                            <option value="30">30</option>
+                            <option value="31">31</option>
+                        </select>
+                    </div>
+                    <div class="col-md-3">
+                        <label for="filter-device" class="form-label">Device ID</label>
+                        <select id="filter-device" class="form-select">
+                            <option value="">All Devices</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="row mt-3">
+                    <div class="col-md-12">
+                        <button class="btn btn-primary" onclick="applyFilters()">
+                            <i class="bi bi-search"></i> Apply Filters
+                        </button>
+                        <button class="btn btn-secondary" onclick="clearFilters()">
+                            <i class="bi bi-x-circle"></i> Clear Filters
+                        </button>
+                        <span id="loading-spinner" class="ms-3" style="display: none;">
+                            <span class="spinner-border spinner-border-sm" role="status"></span>
+                            Loading...
+                        </span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Results Summary -->
+        <div class="alert alert-info" id="results-summary" style="display: none;">
+            <i class="bi bi-info-circle"></i> <span id="results-count"></span>
+        </div>
+
+        <!-- Data Table -->
+        <div class="card shadow-sm">
+            <div class="card-header bg-dark text-white">
+                <h5 class="mb-0"><i class="bi bi-table"></i> Sensor Records</h5>
+            </div>
+            <div class="card-body p-0">
+                <div class="data-table-container">
+                    <table class="table table-striped table-hover mb-0" id="data-table">
+                        <thead class="table-dark sticky-top">
+                            <tr>
+                                <th>Timestamp</th>
+                                <th>Product Code</th>
+                                <th>Device ID</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="table-body">
+                            <tr>
+                                <td colspan="4" class="text-center text-muted">
+                                    <i class="bi bi-inbox"></i> No data available. Apply filters to load data.
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Detail Modal -->
+<div class="modal fade" id="detailModal" tabindex="-1">
+    <div class="modal-dialog modal-xl">
+        <div class="modal-content">
+            <div class="modal-header bg-primary text-white">
+                <h5 class="modal-title">
+                    <i class="bi bi-graph-up"></i> Detailed Statistics
+                </h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body" id="detail-content">
+                <!-- Content loaded dynamically -->
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    let currentData = [];
+
+    // Load filter options on page load
+    $(document).ready(function() {
+        loadFilterOptions();
+        // Auto-load data on page load
+        applyFilters();
+    });
+
+    function loadFilterOptions() {
+        $.ajax({
+            url: '/api/get_filters',
+            type: 'GET',
+            success: function(response) {
+                if (response.success) {
+                    // Populate years
+                    const yearSelect = $('#filter-year');
+                    response.years.forEach(function(year) {
+                        yearSelect.append($('<option></option>').val(year).text(year));
+                    });
+                    
+                    // Populate device IDs
+                    const deviceSelect = $('#filter-device');
+                    response.device_ids.forEach(function(id) {
+                        deviceSelect.append($('<option></option>').val(id).text(id));
+                    });
+                }
+            }
+        });
+    }
+
+    function applyFilters() {
+        const year = $('#filter-year').val();
+        const month = $('#filter-month').val();
+        const date = $('#filter-date').val();
+        const device = $('#filter-device').val();
+        
+        $('#loading-spinner').show();
+        
+        $.ajax({
+            url: '/api/historical_data',
+            type: 'GET',
+            data: {
+                year: year,
+                month: month,
+                date: date,
+                device_id: device
+            },
+            success: function(response) {
+                $('#loading-spinner').hide();
+                
+                if (response.success) {
+                    currentData = response.data;
+                    displayData(response.data);
+                    updateResultsSummary(response.data.length);
+                } else {
+                    alert('Error loading data: ' + response.error);
+                }
+            },
+            error: function() {
+                $('#loading-spinner').hide();
+                alert('Failed to load data');
+            }
+        });
+    }
+
+    function clearFilters() {
+        $('#filter-year').val('');
+        $('#filter-month').val('');
+        $('#filter-date').val('');
+        $('#filter-device').val('');
+        applyFilters();
+    }
+
+    function displayData(data) {
+        const tbody = $('#table-body');
+        tbody.empty();
+        
+        if (data.length === 0) {
+            tbody.append(`
+                <tr>
+                    <td colspan="4" class="text-center text-muted">
+                        <i class="bi bi-inbox"></i> No records found matching the criteria.
+                    </td>
+                </tr>
+            `);
+            return;
+        }
+        
+        data.forEach(function(record) {
+            const timestamp = formatTimestamp(record.time);
+            const row = $(`
+                <tr>
+                    <td>${timestamp}</td>
+                    <td>${record.product_code}</td>
+                    <td><code>${record.device_id}</code></td>
+                    <td>
+                        <button class="btn btn-sm btn-primary" onclick="showDetails(${record.id})">
+                            <i class="bi bi-eye"></i> View Details
+                        </button>
+                    </td>
+                </tr>
+            `);
+            tbody.append(row);
+        });
+    }
+
+    function formatTimestamp(timestamp) {
+        // Format: YYYYMMDD_HHMMSS to YYYY-MM-DD HH:MM:SS
+        const year = timestamp.substr(0, 4);
+        const month = timestamp.substr(4, 2);
+        const day = timestamp.substr(6, 2);
+        const hour = timestamp.substr(9, 2);
+        const minute = timestamp.substr(11, 2);
+        const second = timestamp.substr(13, 2);
+        
+        return `${year}-${month}-${day} ${hour}:${minute}:${second}`;
+    }
+
+    function updateResultsSummary(count) {
+        const summary = $('#results-summary');
+        const countText = $('#results-count');
+        
+        if (count > 0) {
+            countText.text(`Found ${count} record(s)`);
+            summary.show();
+        } else {
+            summary.hide();
+        }
+    }
+
+    function showDetails(recordId) {
+        const record = currentData.find(r => r.id === recordId);
+        if (!record) return;
+        
+        const content = `
+            <div class="row mb-3">
+                <div class="col-md-6">
+                    <h6><i class="bi bi-info-circle"></i> Device Information</h6>
+                    <table class="table table-sm">
+                        <tr><th>Timestamp:</th><td>${formatTimestamp(record.time)}</td></tr>
+                        <tr><th>Product Code:</th><td>${record.product_code}</td></tr>
+                        <tr><th>Device ID:</th><td><code>${record.device_id}</code></td></tr>
+                    </table>
+                </div>
+                <div class="col-md-6">
+                    <h6><i class="bi bi-thermometer-half"></i> Temperature</h6>
+                    <table class="table table-sm">
+                        <tr><th>Mean:</th><td class="stat-cell">${formatValue(record.temperature_mean)} °C</td></tr>
+                        <tr><th>Std Dev:</th><td class="stat-cell">${formatValue(record.temperature_stddev)} °C</td></tr>
+                    </table>
+                </div>
+            </div>
+            
+            <h6><i class="bi bi-arrow-repeat"></i> Gyroscope (deg/s)</h6>
+            <table class="table table-sm table-bordered mb-3">
+                <thead class="table-light">
+                    <tr>
+                        <th>Axis</th>
+                        <th>Mean ± Std Dev</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><strong>X</strong></td>
+                        <td class="stat-cell">${formatValue(record.gyro_x_mean)} ± ${formatValue(record.gyro_x_stddev)}</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Y</strong></td>
+                        <td class="stat-cell">${formatValue(record.gyro_y_mean)} ± ${formatValue(record.gyro_y_stddev)}</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Z</strong></td>
+                        <td class="stat-cell">${formatValue(record.gyro_z_mean)} ± ${formatValue(record.gyro_z_stddev)}</td>
+                    </tr>
+                </tbody>
+            </table>
+            
+            <h6><i class="bi bi-speedometer"></i> Accelerometer (m/s²)</h6>
+            <table class="table table-sm table-bordered mb-3">
+                <thead class="table-light">
+                    <tr>
+                        <th>Axis</th>
+                        <th>Mean ± Std Dev</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><strong>X</strong></td>
+                        <td class="stat-cell">${formatValue(record.acc_x_mean)} ± ${formatValue(record.acc_x_stddev)}</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Y</strong></td>
+                        <td class="stat-cell">${formatValue(record.acc_y_mean)} ± ${formatValue(record.acc_y_stddev)}</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Z</strong></td>
+                        <td class="stat-cell">${formatValue(record.acc_z_mean)} ± ${formatValue(record.acc_z_stddev)}</td>
+                    </tr>
+                </tbody>
+            </table>
+            
+            <h6><i class="bi bi-magnet"></i> Magnetometer (a.u.)</h6>
+            <table class="table table-sm table-bordered mb-3">
+                <thead class="table-light">
+                    <tr>
+                        <th>Axis</th>
+                        <th>Mean ± Std Dev</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><strong>X</strong></td>
+                        <td class="stat-cell">${formatValue(record.mag_x_mean)} ± ${formatValue(record.mag_x_stddev)}</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Y</strong></td>
+                        <td class="stat-cell">${formatValue(record.mag_y_mean)} ± ${formatValue(record.mag_y_stddev)}</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Z</strong></td>
+                        <td class="stat-cell">${formatValue(record.mag_z_mean)} ± ${formatValue(record.mag_z_stddev)}</td>
+                    </tr>
+                </tbody>
+            </table>
+            
+            <h6><i class="bi bi-compass"></i> Euler Angles (deg)</h6>
+            <table class="table table-sm table-bordered">
+                <thead class="table-light">
+                    <tr>
+                        <th>Angle</th>
+                        <th>Mean ± Std Dev</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><strong>Roll</strong></td>
+                        <td class="stat-cell">${formatValue(record.roll_mean)} ± ${formatValue(record.roll_stddev)}</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Pitch</strong></td>
+                        <td class="stat-cell">${formatValue(record.pitch_mean)} ± ${formatValue(record.pitch_stddev)}</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Yaw</strong></td>
+                        <td class="stat-cell">${formatValue(record.yaw_mean)} ± ${formatValue(record.yaw_stddev)}</td>
+                    </tr>
+                </tbody>
+            </table>
+        `;
+        
+        $('#detail-content').html(content);
+        const modal = new bootstrap.Modal(document.getElementById('detailModal'));
+        modal.show();
+    }
+
+    function formatValue(value) {
+        if (value === null || value === undefined) {
+            return 'N/A';
+        }
+        return parseFloat(value).toFixed(6);
+    }
+</script>
+{% endblock %}

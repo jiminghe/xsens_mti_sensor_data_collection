@@ -1,0 +1,280 @@
+{% extends "base.html" %}
+
+{% block title %}Measure Data - Xsens Sensor Data Collection{% endblock %}
+
+{% block extra_css %}
+<style>
+    #console-output {
+        height: 500px;
+        overflow-y: auto;
+        background-color: #1e1e1e;
+        color: #00ff00;
+        font-family: 'Courier New', monospace;
+        font-size: 14px;
+        padding: 15px;
+        border-radius: 5px;
+    }
+    
+    .console-line {
+        margin: 2px 0;
+        white-space: pre-wrap;
+        word-wrap: break-word;
+    }
+    
+    .status-badge {
+        font-size: 1rem;
+        padding: 0.5rem 1rem;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-md-12">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <h2>
+                <i class="bi bi-play-circle"></i> Sensor Data Measurement
+            </h2>
+            <a href="/" class="btn btn-outline-secondary">
+                <i class="bi bi-arrow-left"></i> Back to Home
+            </a>
+        </div>
+
+        <!-- Control Panel -->
+        <div class="card mb-4 shadow-sm">
+            <div class="card-header bg-primary text-white">
+                <h5 class="mb-0"><i class="bi bi-gear"></i> Measurement Control</h5>
+            </div>
+            <div class="card-body">
+                <div class="row align-items-center">
+                    <div class="col-md-6">
+                        <button id="start-btn" class="btn btn-success btn-lg w-100" onclick="startMeasurement()">
+                            <i class="bi bi-play-fill"></i> Start Measurement
+                        </button>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="text-center">
+                            <h6 class="mb-2">Current Status:</h6>
+                            <span id="status-badge" class="badge bg-secondary status-badge">
+                                <i class="bi bi-circle"></i> Ready
+                            </span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Device Information -->
+        <div id="device-info-card" class="card mb-4 shadow-sm" style="display: none;">
+            <div class="card-header bg-info text-white">
+                <h5 class="mb-0"><i class="bi bi-cpu"></i> Device Information</h5>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-6">
+                        <p class="mb-1"><strong>Product Code:</strong> <span id="product-code">-</span></p>
+                    </div>
+                    <div class="col-md-6">
+                        <p class="mb-1"><strong>Device ID:</strong> <span id="device-id">-</span></p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Console Output -->
+        <div class="card shadow-sm">
+            <div class="card-header bg-dark text-white">
+                <h5 class="mb-0">
+                    <i class="bi bi-terminal"></i> Console Output
+                    <button class="btn btn-sm btn-outline-light float-end" onclick="clearConsole()">
+                        <i class="bi bi-trash"></i> Clear
+                    </button>
+                </h5>
+            </div>
+            <div class="card-body p-0">
+                <div id="console-output"></div>
+            </div>
+        </div>
+
+        <!-- Measurement Complete Modal -->
+        <div class="modal fade" id="completeModal" tabindex="-1">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header bg-success text-white">
+                        <h5 class="modal-title">
+                            <i class="bi bi-check-circle"></i> Measurement Complete
+                        </h5>
+                        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                    </div>
+                    <div class="modal-body">
+                        <p class="mb-3">Measurement completed successfully!</p>
+                        <div id="complete-info"></div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                        <a href="/history" class="btn btn-primary">View Historical Data</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<!-- Socket.IO -->
+<script src="https://cdn.socket.io/4.5.4/socket.io.min.js"></script>
+
+<script>
+    let socket;
+    let measurementInProgress = false;
+
+    // Initialize Socket.IO connection
+    function initSocket() {
+        socket = io('/measurement');
+        
+        socket.on('connect', function() {
+            console.log('Connected to server');
+            addConsoleMessage('WebSocket connected', 'info');
+        });
+        
+        socket.on('log_message', function(msg) {
+            addConsoleMessage(msg.data);
+        });
+        
+        socket.on('device_info', function(info) {
+            $('#device-info-card').show();
+            $('#product-code').text(info.product_code);
+            $('#device-id').text(info.device_id);
+        });
+        
+        socket.on('measurement_status', function(data) {
+            updateStatus(data.status);
+        });
+        
+        socket.on('measurement_complete', function(data) {
+            measurementInProgress = false;
+            $('#start-btn').prop('disabled', false);
+            
+            if (data.success) {
+                updateStatus('complete');
+                showCompleteModal(data);
+            } else {
+                updateStatus('error');
+                addConsoleMessage('Error: ' + data.error, 'error');
+            }
+        });
+    }
+
+    function startMeasurement() {
+        if (measurementInProgress) {
+            alert('Measurement already in progress');
+            return;
+        }
+        
+        // Clear previous output
+        clearConsole();
+        $('#device-info-card').hide();
+        
+        measurementInProgress = true;
+        $('#start-btn').prop('disabled', true);
+        updateStatus('starting');
+        
+        $.ajax({
+            url: '/api/start_measurement',
+            type: 'POST',
+            success: function(response) {
+                if (response.success) {
+                    addConsoleMessage('Measurement process started...', 'info');
+                } else {
+                    addConsoleMessage('Error: ' + response.error, 'error');
+                    measurementInProgress = false;
+                    $('#start-btn').prop('disabled', false);
+                    updateStatus('error');
+                }
+            },
+            error: function(xhr) {
+                addConsoleMessage('Failed to start measurement', 'error');
+                measurementInProgress = false;
+                $('#start-btn').prop('disabled', false);
+                updateStatus('error');
+            }
+        });
+    }
+
+    function addConsoleMessage(message, type = 'normal') {
+        const consoleDiv = $('#console-output');
+        const timestamp = new Date().toLocaleTimeString();
+        
+        let color = '#00ff00';
+        if (type === 'error') color = '#ff0000';
+        if (type === 'info') color = '#00bfff';
+        if (type === 'warning') color = '#ffff00';
+        
+        const line = $('<div class="console-line"></div>')
+            .css('color', color)
+            .text(`[${timestamp}] ${message}`);
+        
+        consoleDiv.append(line);
+        consoleDiv.scrollTop(consoleDiv[0].scrollHeight);
+    }
+
+    function clearConsole() {
+        $('#console-output').empty();
+    }
+
+    function updateStatus(status) {
+        const badge = $('#status-badge');
+        badge.removeClass('bg-secondary bg-primary bg-warning bg-success bg-danger bg-info');
+        
+        switch(status) {
+            case 'starting':
+            case 'initializing':
+                badge.addClass('bg-primary');
+                badge.html('<i class="bi bi-hourglass-split"></i> Initializing...');
+                break;
+            case 'configuring':
+                badge.addClass('bg-info');
+                badge.html('<i class="bi bi-gear-fill"></i> Configuring...');
+                break;
+            case 'recording':
+                badge.addClass('bg-warning');
+                badge.html('<i class="bi bi-record-circle"></i> Recording...');
+                break;
+            case 'analyzing':
+                badge.addClass('bg-info');
+                badge.html('<i class="bi bi-graph-up"></i> Analyzing...');
+                break;
+            case 'complete':
+                badge.addClass('bg-success');
+                badge.html('<i class="bi bi-check-circle"></i> Complete');
+                break;
+            case 'error':
+                badge.addClass('bg-danger');
+                badge.html('<i class="bi bi-x-circle"></i> Error');
+                break;
+            default:
+                badge.addClass('bg-secondary');
+                badge.html('<i class="bi bi-circle"></i> Ready');
+        }
+    }
+
+    function showCompleteModal(data) {
+        const info = `
+            <p><strong>Record ID:</strong> ${data.record_id}</p>
+            <p><strong>MTB File:</strong> ${data.mtb_file}</p>
+            <p><strong>CSV File:</strong> ${data.csv_file}</p>
+        `;
+        $('#complete-info').html(info);
+        
+        const modal = new bootstrap.Modal(document.getElementById('completeModal'));
+        modal.show();
+    }
+
+    // Initialize on page load
+    $(document).ready(function() {
+        initSocket();
+        addConsoleMessage('System ready. Click "Start Measurement" to begin.', 'info');
+    });
+</script>
+{% endblock %}
