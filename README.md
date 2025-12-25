@@ -18,6 +18,10 @@ Professional web-based application for Xsens MTi sensor data collection, analysi
 - 30-second data recording at 100Hz
 - Automatic statistical analysis
 - Database storage
+- **Gyro bias calibration (Firmware 1.13.0)**
+  - Automatic bias estimation from recorded data
+  - Quality assessment of calibration
+  - Optional bias application to sensor
 
 ### 📈 Historical Data Viewer
 - Browse all recorded sensor measurements
@@ -41,6 +45,7 @@ Professional web-based application for Xsens MTi sensor data collection, analysi
 ├── app.py                      # Flask application (main server)
 ├── sensor_recorder.py          # Device configuration and recording
 ├── data_analyzer.py            # Data analysis and database operations
+├── gyro_bias_manager.py        # Gyro bias calibration module (NEW)
 ├── main.py                     # Command-line interface (optional)
 ├── requirements.txt            # Python dependencies
 ├── README.md                   # This file
@@ -125,6 +130,26 @@ Press Ctrl+C to stop the server
 3. Click "View Details" on any record to see complete statistics
 4. The detail modal shows mean ± std dev for all sensor axes
 
+### Gyro Bias Calibration (Firmware 1.13.0 Only)
+After measurement completes, if the device firmware version is 1.13.0:
+
+1. **Automatic Detection**: System automatically checks firmware version
+2. **Bias Calculation**: Gyro bias is calculated from the recorded data
+3. **Quality Assessment**: Standard deviation is evaluated (threshold: 0.20 deg/s)
+4. **User Prompt**: A modal dialog appears showing:
+   - Calculated bias values (X, Y, Z axes)
+   - Standard deviation for each axis
+   - Quality indicator (Green = Good, Yellow = Warning)
+5. **Apply or Skip**: 
+   - Click "Apply Bias" to set the calibration values
+   - Click "Skip" to ignore the calibration
+
+**Quality Indicators:**
+- ✅ **Good Quality**: Std Dev < 0.20 deg/s (stable measurement)
+- ⚠️ **Warning**: Std Dev > 0.20 deg/s (consider re-measuring with better stability)
+
+**Note**: Bias calibration adjusts the sensor's internal gyroscope offset to compensate for drift.
+
 ## Technical Details
 
 ### Sensors Configured (100Hz)
@@ -148,7 +173,7 @@ Press Ctrl+C to stop the server
 ### Database Schema
 SQLite database with the following fields:
 - Timestamp (YYYYMMDD_HHMMSS)
-- Device information (product_code, device_id)
+- Device information (product_code, device_id, firmware_version, filter_profile)
 - Gyroscope statistics (mean, stddev for X, Y, Z)
 - Accelerometer statistics (mean, stddev for X, Y, Z)
 - Magnetometer statistics (mean, stddev for X, Y, Z)

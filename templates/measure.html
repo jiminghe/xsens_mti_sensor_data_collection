@@ -123,6 +123,50 @@
                 </div>
             </div>
         </div>
+
+        <!-- Bias Calibration Modal -->
+        <div class="modal fade" id="biasCalibrationModal" tabindex="-1">
+            <div class="modal-dialog modal-lg">
+                <div class="modal-content">
+                    <div class="modal-header bg-warning text-dark">
+                        <h5 class="modal-title">
+                            <i class="bi bi-gear-fill"></i> Gyroscope Bias Calibration
+                        </h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                    </div>
+                    <div class="modal-body">
+                        <div class="alert alert-info">
+                            <i class="bi bi-info-circle"></i> 
+                            The sensor was measured with zero bias offset. Choose which bias values to apply.
+                        </div>
+                        
+                        <h6>Bias Comparison:</h6>
+                        <div id="bias-comparison"></div>
+                        
+                        <div id="bias-quality-warning" class="alert alert-warning mt-3" style="display: none;">
+                            <i class="bi bi-exclamation-triangle"></i> 
+                            <strong>Quality Warning:</strong> High variability detected in the new measurements. 
+                            Standard deviations exceed 0.20 deg/s threshold. Consider keeping the original bias or re-measuring with better stability.
+                        </div>
+                        
+                        <div id="bias-quality-good" class="alert alert-success mt-3" style="display: none;">
+                            <i class="bi bi-check-circle"></i> 
+                            <strong>Good Quality:</strong> New measurements show low variability (std dev < 0.20 deg/s). Safe to apply new bias values.
+                        </div>
+                        
+                        <p class="mt-3"><strong>Which bias values do you want to apply?</strong></p>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" id="keep-original-btn" onclick="keepOriginalBias()">
+                            <i class="bi bi-arrow-counterclockwise"></i> Keep Original
+                        </button>
+                        <button type="button" class="btn btn-primary" id="apply-new-btn" onclick="applyNewBias()">
+                            <i class="bi bi-gear-fill"></i> Apply New Bias
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
     </div>
 </div>
 {% endblock %}
@@ -134,6 +178,7 @@
 <script>
     let socket;
     let measurementInProgress = false;
+    let currentBiasData = null;
 
     // Initialize Socket.IO connection
     function initSocket() {
@@ -160,13 +205,22 @@
             updateStatus(data.status);
         });
         
+        socket.on('bias_calibration_available', function(data) {
+            currentBiasData = data;
+            showBiasCalibrationModal(data);
+        });
+        
         socket.on('measurement_complete', function(data) {
             measurementInProgress = false;
             $('#start-btn').prop('disabled', false);
             
             if (data.success) {
                 updateStatus('complete');
-                showCompleteModal(data);
+                
+                // Show completion modal only if no bias calibration
+                if (!data.bias_data || !data.bias_data.available) {
+                    showCompleteModal(data);
+                }
             } else {
                 updateStatus('error');
                 addConsoleMessage('Error: ' + data.error, 'error');
@@ -277,6 +331,168 @@
         
         const modal = new bootstrap.Modal(document.getElementById('completeModal'));
         modal.show();
+    }
+
+    function showBiasCalibrationModal(biasData) {
+        // Display bias comparison
+        const comparisonHtml = `
+            <table class="table table-sm table-bordered">
+                <thead class="table-light">
+                    <tr>
+                        <th>Axis</th>
+                        <th>Original Bias (deg/s)</th>
+                        <th>New Bias (deg/s)</th>
+                        <th>Std Dev (deg/s)</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><strong>X</strong></td>
+                        <td class="stat-cell">${biasData.original_bias_x.toFixed(4)}</td>
+                        <td class="stat-cell">${biasData.new_bias_x.toFixed(4)}</td>
+                        <td class="stat-cell">${biasData.std_x.toFixed(4)}</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Y</strong></td>
+                        <td class="stat-cell">${biasData.original_bias_y.toFixed(4)}</td>
+                        <td class="stat-cell">${biasData.new_bias_y.toFixed(4)}</td>
+                        <td class="stat-cell">${biasData.std_y.toFixed(4)}</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Z</strong></td>
+                        <td class="stat-cell">${biasData.original_bias_z.toFixed(4)}</td>
+                        <td class="stat-cell">${biasData.new_bias_z.toFixed(4)}</td>
+                        <td class="stat-cell">${biasData.std_z.toFixed(4)}</td>
+                    </tr>
+                </tbody>
+            </table>
+        `;
+        $('#bias-comparison').html(comparisonHtml);
+        
+        // Show quality indicator
+        if (biasData.quality_good) {
+            $('#bias-quality-good').show();
+            $('#bias-quality-warning').hide();
+        } else {
+            $('#bias-quality-warning').show();
+            $('#bias-quality-good').hide();
+        }
+        
+        const modal = new bootstrap.Modal(document.getElementById('biasCalibrationModal'));
+        modal.show();
+    }
+
+    function applyNewBias() {
+        if (!currentBiasData) {
+            alert('No bias data available');
+            return;
+        }
+        
+        $('#apply-new-btn').prop('disabled', true).html('<span class="spinner-border spinner-border-sm"></span> Applying...');
+        $('#keep-original-btn').prop('disabled', true);
+        
+        addConsoleMessage('Applying new bias calibration to sensor...', 'info');
+        
+        $.ajax({
+            url: '/api/apply_bias',
+            type: 'POST',
+            contentType: 'application/json',
+            data: JSON.stringify({
+                bias_x: currentBiasData.new_bias_x,
+                bias_y: currentBiasData.new_bias_y,
+                bias_z: currentBiasData.new_bias_z
+            }),
+            success: function(response) {
+                if (response.success) {
+                    addConsoleMessage('✓ ' + response.message, 'info');
+                    
+                    // Close bias modal
+                    bootstrap.Modal.getInstance(document.getElementById('biasCalibrationModal')).hide();
+                    
+                    // Show completion modal
+                    $('#complete-info').html(`
+                        <div class="alert alert-success">
+                            <i class="bi bi-check-circle-fill"></i> <strong>New Bias Successfully Applied!</strong>
+                        </div>
+                        <table class="table table-sm">
+                            <tr><th>X-axis:</th><td>${currentBiasData.new_bias_x.toFixed(4)} deg/s</td></tr>
+                            <tr><th>Y-axis:</th><td>${currentBiasData.new_bias_y.toFixed(4)} deg/s</td></tr>
+                            <tr><th>Z-axis:</th><td>${currentBiasData.new_bias_z.toFixed(4)} deg/s</td></tr>
+                        </table>
+                        <p class="text-muted small">The sensor's gyroscope bias has been updated with the newly calculated values.</p>
+                    `);
+                    
+                    const completeModal = new bootstrap.Modal(document.getElementById('completeModal'));
+                    completeModal.show();
+                } else {
+                    addConsoleMessage('✗ Failed to apply new bias: ' + response.error, 'error');
+                    alert('Failed to apply new bias: ' + response.error);
+                }
+            },
+            error: function(xhr) {
+                const errorMsg = xhr.responseJSON ? xhr.responseJSON.error : 'Unknown error';
+                addConsoleMessage('✗ Failed to apply new bias: ' + errorMsg, 'error');
+                alert('Failed to apply new bias calibration: ' + errorMsg);
+            },
+            complete: function() {
+                $('#apply-new-btn').prop('disabled', false).html('<i class="bi bi-gear-fill"></i> Apply New Bias');
+                $('#keep-original-btn').prop('disabled', false);
+            }
+        });
+    }
+
+    function keepOriginalBias() {
+        if (!currentBiasData) {
+            alert('No bias data available');
+            return;
+        }
+        
+        addConsoleMessage('Restoring original bias values...', 'info');
+        
+        $('#keep-original-btn').prop('disabled', true).html('<span class="spinner-border spinner-border-sm"></span> Restoring...');
+        $('#apply-new-btn').prop('disabled', true);
+        
+        $.ajax({
+            url: '/api/skip_bias',
+            type: 'POST',
+            contentType: 'application/json',
+            data: JSON.stringify({
+                original_bias_x: currentBiasData.original_bias_x,
+                original_bias_y: currentBiasData.original_bias_y,
+                original_bias_z: currentBiasData.original_bias_z
+            }),
+            success: function(response) {
+                if (response.success) {
+                    addConsoleMessage('✓ ' + response.message, 'info');
+                    
+                    // Close bias modal
+                    bootstrap.Modal.getInstance(document.getElementById('biasCalibrationModal')).hide();
+                    
+                    // Show completion modal
+                    $('#complete-info').html(`
+                        <div class="alert alert-info">
+                            <i class="bi bi-arrow-counterclockwise"></i> <strong>Original Bias Restored</strong>
+                        </div>
+                        <table class="table table-sm">
+                            <tr><th>X-axis:</th><td>${currentBiasData.original_bias_x.toFixed(4)} deg/s</td></tr>
+                            <tr><th>Y-axis:</th><td>${currentBiasData.original_bias_y.toFixed(4)} deg/s</td></tr>
+                            <tr><th>Z-axis:</th><td>${currentBiasData.original_bias_z.toFixed(4)} deg/s</td></tr>
+                        </table>
+                        <p class="text-muted small">The sensor's gyroscope bias has been restored to its original values.</p>
+                    `);
+                    
+                    const completeModal = new bootstrap.Modal(document.getElementById('completeModal'));
+                    completeModal.show();
+                }
+            },
+            error: function() {
+                alert('Failed to restore original bias');
+            },
+            complete: function() {
+                $('#keep-original-btn').prop('disabled', false).html('<i class="bi bi-arrow-counterclockwise"></i> Keep Original');
+                $('#apply-new-btn').prop('disabled', false);
+            }
+        });
     }
 
     // Initialize on page load
