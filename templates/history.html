@@ -352,6 +352,8 @@
                         <tr><th>Timestamp:</th><td>${formatTimestamp(record.time)}</td></tr>
                         <tr><th>Product Code:</th><td>${record.product_code}</td></tr>
                         <tr><th>Device ID:</th><td><code>${record.device_id}</code></td></tr>
+                        <tr><th>Firmware Version:</th><td>${record.firmware_version || 'N/A'}</td></tr>
+                        <tr><th>Filter Profile:</th><td>${record.filter_profile || 'N/A'}</td></tr>
                     </table>
                 </div>
                 <div class="col-md-6">

@@ -110,6 +110,8 @@ class DataAnalyzer:
                 time TEXT NOT NULL,
                 product_code TEXT NOT NULL,
                 device_id TEXT NOT NULL,
+                firmware_version TEXT,
+                filter_profile TEXT,
                 gyro_x_mean REAL,
                 gyro_x_stddev REAL,
                 gyro_y_mean REAL,
@@ -166,6 +168,8 @@ class DataAnalyzer:
             timestamp,
             device_info['product_code'],
             device_info['device_id'],
+            device_info.get('firmware_version', None),
+            device_info.get('filter_profile', None),
             statistics.get('gyr_x_mean'),
             statistics.get('gyr_x_stddev'),
             statistics.get('gyr_y_mean'),
@@ -197,7 +201,7 @@ class DataAnalyzer:
         # Insert data
         cursor.execute('''
             INSERT INTO sensor_data (
-                time, product_code, device_id,
+                time, product_code, device_id, firmware_version, filter_profile,
                 gyro_x_mean, gyro_x_stddev,
                 gyro_y_mean, gyro_y_stddev,
                 gyro_z_mean, gyro_z_stddev,
@@ -211,7 +215,7 @@ class DataAnalyzer:
                 pitch_mean, pitch_stddev,
                 yaw_mean, yaw_stddev,
                 temperature_mean, temperature_stddev
-            ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+            ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
         ''', insert_data)
         
         conn.commit()
@@ -223,6 +227,8 @@ class DataAnalyzer:
         print(f"Timestamp: {timestamp}")
         print(f"Product Code: {device_info['product_code']}")
         print(f"Device ID: {device_info['device_id']}")
+        print(f"Firmware Version: {device_info.get('firmware_version', 'N/A')}")
+        print(f"Filter Profile: {device_info.get('filter_profile', 'N/A')}")
         
         return row_id
     

@@ -71,11 +71,17 @@
             </div>
             <div class="card-body">
                 <div class="row">
-                    <div class="col-md-6">
+                    <div class="col-md-3">
                         <p class="mb-1"><strong>Product Code:</strong> <span id="product-code">-</span></p>
                     </div>
-                    <div class="col-md-6">
+                    <div class="col-md-3">
                         <p class="mb-1"><strong>Device ID:</strong> <span id="device-id">-</span></p>
+                    </div>
+                    <div class="col-md-3">
+                        <p class="mb-1"><strong>Firmware Version:</strong> <span id="firmware-version">-</span></p>
+                    </div>
+                    <div class="col-md-3">
+                        <p class="mb-1"><strong>Filter Profile:</strong> <span id="filter-profile">-</span></p>
                     </div>
                 </div>
             </div>
@@ -146,6 +152,8 @@
             $('#device-info-card').show();
             $('#product-code').text(info.product_code);
             $('#device-id').text(info.device_id);
+            $('#firmware-version').text(info.firmware_version || 'N/A');
+            $('#filter-profile').text(info.filter_profile || 'N/A');
         });
         
         socket.on('measurement_status', function(data) {

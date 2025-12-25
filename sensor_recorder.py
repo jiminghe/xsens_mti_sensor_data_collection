@@ -92,8 +92,18 @@ class SensorRecorder:
         self.device_info['device_id'] = self.device.deviceId().toXsString()
         self.device_info['product_code'] = self.device.productCode()
         
+        # Get firmware version
+        firmware_version = self.device.firmwareVersion()
+        self.device_info['firmware_version'] = firmware_version.toXsString()
+        
+        # Get filter profile
+        filter_profile = self.device.onboardFilterProfile()
+        self.device_info['filter_profile'] = filter_profile.toXsString()
+        
         print("Device: %s, with ID: %s opened." % 
               (self.device_info['product_code'], self.device_info['device_id']))
+        print("Firmware version: %s" % self.device_info['firmware_version'])
+        print("Onboard Kalman Filter Profile: %s" % self.device_info['filter_profile'])
 
         # Create and attach callback handler
         self.callback = XdaCallback()

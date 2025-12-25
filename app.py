@@ -194,6 +194,8 @@ def get_historical_data():
                 'time': row['time'],
                 'product_code': row['product_code'],
                 'device_id': row['device_id'],
+                'firmware_version': row['firmware_version'],
+                'filter_profile': row['filter_profile'],
                 'gyro_x_mean': row['gyro_x_mean'],
                 'gyro_x_stddev': row['gyro_x_stddev'],
                 'gyro_y_mean': row['gyro_y_mean'],
