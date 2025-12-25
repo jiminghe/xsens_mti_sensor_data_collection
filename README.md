@@ -76,13 +76,18 @@ Professional web-based application for Xsens MTi sensor data collection, analysi
 - Xsens MTi device
 - Xsens Device API installed
 
-### Step 1: Install Python Dependencies
+### Step 1: Install Python Dependencies with Virtual Environment(Windows 11 example)
 ```bash
+python -m venv venv
+venv/Scripts/activate
 pip install -r requirements.txt
 ```
 
 ### Step 2: Install Xsens Device API
-Follow the official Xsens documentation to install the xsensdeviceapi package for your platform.
+Install the xsensdeviceapi package for your platform, for example for python 3.10 Windows 11:
+```bash
+pip install whl_files/xsensdeviceapi-2025.5.0-cp310-none-win_amd64.whl
+```
 
 ## Usage
 
@@ -130,7 +135,7 @@ Press Ctrl+C to stop the server
 3. Click "View Details" on any record to see complete statistics
 4. The detail modal shows mean ± std dev for all sensor axes
 
-### Gyro Bias Calibration (Firmware 1.13.0 Only)
+### Gyro Bias Calibration (MTi-600 Firmware 1.13.0 Only)
 After measurement completes, if the device firmware version is 1.13.0:
 
 1. **Automatic Detection**: System automatically checks firmware version
