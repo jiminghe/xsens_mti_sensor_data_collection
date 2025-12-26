@@ -5,8 +5,9 @@ Handles device configuration and data recording to .mtb and .csv files
 
 import sys
 import xsensdeviceapi as xda
-from threading import Lock
+from threading import Lock, Thread
 import datetime
+import time
 import csv
 import math
 import os
@@ -51,6 +52,42 @@ class SensorRecorder:
         self.callback = None
         self.mtPort = None
         self.device_info = {}
+    
+    def _scan_port_with_timeout(self, port, baudrate, timeout=2):
+        """
+        Scan a port with a timeout to prevent hanging
+        
+        Args:
+            port: COM port name
+            baudrate: Baudrate to try
+            timeout: Timeout in seconds (default: 2)
+            
+        Returns:
+            XsPortInfo object or None if timeout/error
+        """
+        result = [None]
+        exception = [None]
+        
+        def scan_thread():
+            try:
+                result[0] = xda.XsScanner_scanPort(port, baudrate)
+            except Exception as e:
+                exception[0] = e
+        
+        thread = Thread(target=scan_thread)
+        thread.daemon = True
+        thread.start()
+        thread.join(timeout)
+        
+        if thread.is_alive():
+            print(f"  → Timeout after {timeout}s - skipping")
+            return None
+        
+        if exception[0]:
+            print(f"  → Error: {exception[0]}")
+            return None
+        
+        return result[0]
         
     def initialize(self):
         """Initialize XsControl and scan for devices"""
@@ -75,9 +112,9 @@ class SensorRecorder:
                 print(f"Found MTi device on {self.mtPort.portName()}")
                 break
         
-        # Method 2: If automatic scan failed, try manual scanning
+        # Method 2: If automatic scan failed, try manual scanning with timeout
         if self.mtPort.empty():
-            print("Method 1 failed. Trying Method 2: Manual port scanning...")
+            print("Method 1 failed. Trying Method 2: Manual port scanning with timeout...")
             
             # Get all available COM ports
             import serial.tools.list_ports
@@ -87,38 +124,48 @@ class SensorRecorder:
             if not available_ports:
                 raise RuntimeError("No COM ports found. Aborting.")
             
-            # Common baudrates to try
-            baudrates = [115200, 921600, 2000000, 460800, 230400]
+            # Common baudrates to try (reduced to most common for MTi devices)
+            baudrates = [115200, 921600, 460800]
             
             # Try each port with each baudrate
             found = False
             for port in available_ports:
-                for baudrate in baudrates:
-                    print(f"Trying {port} at {baudrate} baud...")
-                    try:
-                        test_port = xda.XsScanner_scanPort(port, baudrate)
-                        if not test_port.empty():
-                            if test_port.deviceId().isMti() or test_port.deviceId().isMtig():
-                                self.mtPort = test_port
-                                print(f"Found MTi device on {port} at {baudrate} baud!")
-                                found = True
-                                break
-                    except Exception as e:
-                        print(f"Error scanning {port} at {baudrate}: {e}")
-                        continue
-                
                 if found:
                     break
+                    
+                print(f"\nScanning {port}...")
+                for baudrate in baudrates:
+                    print(f"  Trying {baudrate} baud...", end=" ")
+                    
+                    try:
+                        test_port = self._scan_port_with_timeout(port, baudrate, timeout=2)
+                        
+                        if test_port and not test_port.empty():
+                            if test_port.deviceId().isMti() or test_port.deviceId().isMtig():
+                                self.mtPort = test_port
+                                print(f"  ✓ Found MTi device on {port} at {baudrate} baud!")
+                                found = True
+                                break
+                            else:
+                                print(f"  → Found device but not MTi/MTig")
+                        else:
+                            print(f"  → No device found")
+                            
+                    except Exception as e:
+                        print(f"  → Exception: {e}")
+                        continue
         
         # Final check
         if self.mtPort.empty():
             raise RuntimeError("No MTi device found after trying all methods. Aborting.")
 
         did = self.mtPort.deviceId()
+        print("\n" + "="*60)
         print("Found a device with:")
         print(" Device ID: %s" % did.toXsString())
         print(" Port name: %s" % self.mtPort.portName())
         print(" Baudrate: %s" % self.mtPort.baudrate())
+        print("="*60)
 
         print("Opening port...")
         if not self.control.openPort(self.mtPort.portName(), self.mtPort.baudrate()):
